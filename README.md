@@ -1,38 +1,69 @@
 # Hinglish Toxicity Detection: BERT + BiLSTM
 
-Why a plain BERT classifier misses toxic comments in code-mixed
-Hindi-English (Hinglish) text — and how adding a bidirectional LSTM
-head fixes it.
+Why a plain BERT classifier and a BERT+BiLSTM hybrid perform the way they
+do on code-mixed Hindi-English (Hinglish) toxic content — and what that
+reveals about when architectural complexity actually helps.
 
 ## The problem
 
-Most toxicity classifiers are trained and tuned on English. Hindi
-social media text is frequently code-mixed (Hinglish), has free word
-order, and mixes scripts (Devanagari + Latin). A flat BERT classifier
-often misses toxic terms that shift position in the sentence — a
-BiLSTM head, fed BERT's contextual embeddings, models that sequential
-context and closes the gap.
+Most toxicity classifiers are trained and tuned on English. Hindi social
+media text is frequently code-mixed (Hinglish), has free word order, and
+mixes scripts (Devanagari + Latin). This repo explores whether adding a
+bidirectional LSTM head on top of BERT's contextual embeddings improves
+detection — and reports an honest result, not just a clean win.
 
 ## What's in this repo
 
-- `bert_baseline.py` — BERT-only classifier (the baseline that misses
-  certain code-mixed examples)
-- `bert_bilstm.py` — BERT embeddings + BiLSTM head (the fix)
-- `notebook.ipynb` — runnable Colab version, free-tier friendly
+- `bert_baseline.py` — plain BERT classifier (pooled output → linear layer)
+- `bert_bilstm.py` — two hybrid variants:
+  - **BERT → BiLSTM**: full token-level BERT embeddings fed through a BiLSTM
+  - **BiLSTM → BERT (frozen)**: BERT frozen, only the single pooled vector
+    fed through a BiLSTM
+- `data/hinglish_toxicity_sample_500.csv` — 500-row balanced sample (250
+  toxic / 250 non-toxic), filtered from a larger 60k-post corpus for label
+  quality (see **Dataset** below)
 - `requirements.txt`
+
+## Setup
+
+```bash
+pip install -r requirements.txt
+python bert_baseline.py
+python bert_bilstm.py
+```
+
+Runs on CPU; each script takes roughly 20 minutes on a typical laptop.
 
 ## Dataset
 
-Uses a small public Hinglish dataset (HASOC / TRAC) — no proprietary
-data required. See `data/` for the loading script.
+This sample is drawn from a larger 60,000-post Hindi social media dataset
+(Twitter + Reddit) used in published research on Hindi toxic content
+detection. Manual inspection showed meaningful label noise in the full
+corpus — a portion of "toxic"-labeled rows were neutral news or opinion
+text, not actually abusive language. To keep this tutorial's results
+interpretable, this 500-row sample was **keyword-filtered and length-capped**
+to select clearly-labeled examples of each class, then manually
+spot-checked. This makes the classification task easier than the full,
+noisy corpus — a deliberate tradeoff for a clear teaching example, not a
+benchmark claim.
 
 ## Results
 
-Trained and evaluated on this repo's dataset (numbers here will
-differ from the original research paper, which used a larger private
-corpus — see [paper link] for those results).
+| Model                          | Accuracy | Precision | Recall | F1   |
+|---------------------------------|----------|-----------|--------|------|
+| Plain BERT (baseline)           | 0.96     | 0.98      | 0.94   | 0.96 |
+| BERT → BiLSTM                   | 0.95     | 1.00      | 0.88   | 0.94 |
+| BiLSTM → BERT (frozen)          | 0.65     | 0.56      | 0.93   | 0.70 |
 
-## Background
+**Notable finding:** on this clean, filtered sample, the plain BERT
+baseline matches or slightly edges out the BERT→BiLSTM hybrid. This
+doesn't contradict prior published results — it suggests the BiLSTM's
+sequential modeling advantage matters more on **larger, noisier, more
+ambiguous** real-world data than on a small, clearly-labeled sample. The
+frozen BiLSTM→BERT variant performs far worse, which makes sense
+architecturally: freezing BERT and passing only a single pooled vector
+through a bidirectional LSTM leaves no real sequence to model.
 
-This code is adapted from research on hybrid transformer architectures
-for toxic Hindi content detection, published at ICMLDE 2025.
+## License
+
+MIT
