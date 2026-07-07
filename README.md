@@ -4,6 +4,11 @@ Why a plain BERT classifier and a BERT+BiLSTM hybrid perform the way they
 do on code-mixed Hindi-English (Hinglish) toxic content — and what that
 reveals about when architectural complexity actually helps.
 
+## Related writeups
+
+- [Full analysis: BERT vs BERT+BiLSTM — an honest result](https://dev.to/udgithubit/bert-vs-bertbilstm-an-honest-result-on-hinglish-toxicity-detection-1c1m)
+- [Step-by-step tutorial: Fine-tuning mBERT for Hinglish toxicity classification](https://dev.to/udgithubit/how-to-fine-tune-mbert-for-hinglish-toxicity-classification-a-step-by-step-guide-f27)
+
 ## The problem
 
 Most toxicity classifiers are trained and tuned on English. Hindi social
@@ -19,6 +24,9 @@ detection — and reports an honest result, not just a clean win.
   - **BERT → BiLSTM**: full token-level BERT embeddings fed through a BiLSTM
   - **BiLSTM → BERT (frozen)**: BERT frozen, only the single pooled vector
     fed through a BiLSTM
+- `hinglish-tutorial.md` — step-by-step walkthrough of training the
+  baseline BERT classifier from scratch, written as a companion to the
+  analysis above
 - `data/hinglish_toxicity_sample_500.csv` — 500-row balanced sample (250
   toxic / 250 non-toxic), filtered from a larger 60k-post corpus for label
   quality (see **Dataset** below)
