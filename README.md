@@ -6,7 +6,7 @@ reveals about when architectural complexity actually helps.
 
 ## Related writeups
 
-- [Full analysis: BERT vs BERT+BiLSTM — an honest result](https://dev.to/udgithubit/bert-vs-bertbilstm-an-honest-result-on-hinglish-toxicity-detection-1c1m)
+- [Full analysis: BERT vs BERT+BiLSTM — an honest result](https://dev.to/udgithubit/bert-vs-bertbilstm-an-honest-result-on-hinglish-toxicity-detection-1c1m/stats)
 - [Step-by-step tutorial: Fine-tuning mBERT for Hinglish toxicity classification](https://dev.to/udgithubit/how-to-fine-tune-mbert-for-hinglish-toxicity-classification-a-step-by-step-guide-f27)
 
 ## The problem
@@ -45,8 +45,10 @@ Runs on CPU; each script takes roughly 20 minutes on a typical laptop.
 ## Dataset
 
 This sample is drawn from a larger 60,000-post Hindi social media dataset
-(Twitter + Reddit) used in published research on Hindi toxic content
-detection. Manual inspection showed meaningful label noise in the full
+(30k Reddit + 30k X/Twitter posts), used in a separate research paper on
+Hindi toxic content detection ("Hybrid Transformer-Based Neural
+Architectures for Toxic Hindi Social Media," accepted and presented at
+CSCT 2025). Manual inspection showed meaningful label noise in the full
 corpus — a portion of "toxic"-labeled rows were neutral news or opinion
 text, not actually abusive language. To keep this tutorial's results
 interpretable, this 500-row sample was **keyword-filtered and length-capped**
@@ -71,6 +73,16 @@ ambiguous** real-world data than on a small, clearly-labeled sample. The
 frozen BiLSTM→BERT variant performs far worse, which makes sense
 architecturally: freezing BERT and passing only a single pooled vector
 through a bidirectional LSTM leaves no real sequence to model.
+
+**Note on the full-scale result:** this repo is a small, clean teaching
+demo, not a benchmark. On the complete 60,000-record corpus (the messier,
+real-world version of this data), the BiLSTM head does show a measurable
+improvement — reaching 94.2% accuracy in a separate research paper
+("Hybrid Transformer-Based Neural Architectures for Toxic Hindi Social
+Media," accepted and presented at CSCT 2025). That's consistent with the
+explanation above: a BiLSTM's sequential modeling earns its keep on
+ambiguous, noisy data, and this repo's 500-row sample was deliberately
+filtered to remove exactly that ambiguity.
 
 ## License
 
